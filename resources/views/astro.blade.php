@@ -94,21 +94,30 @@
         </div>
 
         <div>
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">🛸 Galeri Mars Rover Curiosity</h2>
-            @if(count($marsPhotos) > 0)
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">🌍 Pantauan Rotasi Bumi (Satelit DSCOVR)</h2>
+            @if(isset($earthPhotos) && count($earthPhotos) > 0)
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    @foreach($marsPhotos as $photo)
-                        <div class="relative group overflow-hidden rounded-lg">
-                            <img src="{{ $photo['img_src'] }}" alt="Mars Photo" class="w-full h-48 object-cover transform transition duration-500 group-hover:scale-110">
-                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 p-2 translate-y-full group-hover:translate-y-0 transition duration-300">
-                                <p class="text-xs text-white">Kamera: {{ $photo['camera']['full_name'] }}</p>
+                    @php
+                        // Memecah format YYYY-MM-DD biar bisa dipakai menyusun URL gambar NASA
+                        $year = substr($date, 0, 4);
+                        $month = substr($date, 5, 2);
+                        $day = substr($date, 8, 2);
+                    @endphp
+
+                    @foreach($earthPhotos as $photo)
+                        <div class="relative group overflow-hidden rounded-full bg-black border-4 border-gray-800 shadow-xl">
+                            <img src="https://epic.gsfc.nasa.gov/archive/natural/{{$year}}/{{$month}}/{{$day}}/jpg/{{$photo['image']}}.jpg" 
+                                 alt="Rotasi Bumi" 
+                                 class="w-full h-auto object-cover transform transition duration-500 group-hover:scale-105">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-3 translate-y-full group-hover:translate-y-0 transition duration-300 text-center">
+                                <p class="text-xs text-white font-bold">Waktu Jepret: <br> {{ \Carbon\Carbon::parse($photo['date'])->format('H:i:s') }}</p>
                             </div>
                         </div>
                     @endforeach
                 </div>
             @else
                 <div class="bg-gray-800 text-center p-8 rounded-xl border border-gray-700">
-                    <p class="text-gray-400">Robot Curiosity tidak mengambil foto pada tanggal ini. Coba tanggal lain.</p>
+                    <p class="text-gray-400">Belum ada tangkapan citra satelit pada tanggal ini (Satelit EPIC biasanya memiliki delay rilis data 1-2 hari).</p>
                 </div>
             @endif
         </div>

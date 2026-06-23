@@ -34,16 +34,14 @@ class AstroController extends Controller
             $asteroids = $neoData['near_earth_objects'][$date] ?? [];
         }
 
-        // 3. Tembak API Mars Rover (Foto dari robot Curiosity di Mars)
-        $marsResponse = Http::get("https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos", [
-            'earth_date' => $date,
+       // 3. Tembak API EPIC (Satelit DSCOVR Pemantau Rotasi Bumi)
+        $epicResponse = Http::get("https://api.nasa.gov/EPIC/api/natural/date/{$date}", [
             'api_key' => $apiKey
         ]);
-        $marsPhotos = [];
-        if ($marsResponse->successful()) {
-            $marsData = $marsResponse->json();
-            // Kita ambil maksimal 8 foto aja biar tampilan web nggak berat
-            $marsPhotos = array_slice($marsData['photos'] ?? [], 0, 8);
+        $earthPhotos = [];
+        if ($epicResponse->successful()) {
+            // Ambil maksimal 4 frame rotasi bumi biar tampilannya pas sebaris
+            $earthPhotos = array_slice($epicResponse->json() ?? [], 0, 4);
         }
 
         // Lempar ke tampilan web
