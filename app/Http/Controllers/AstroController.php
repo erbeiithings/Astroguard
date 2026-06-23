@@ -12,8 +12,9 @@ class AstroController extends Controller
         // Pake API Key dari .env (atau DEMO_KEY)
         $apiKey = env('NASA_API_KEY', 'DEMO_KEY');
         
-        // Ambil tanggal dari input user, default-nya hari ini
-        $date = $request->input('date', date('Y-m-d'));
+        // Ambil tanggal dari input user, default-nya mundur 2 hari biar gambar EPIC selalu ada
+        // Bikin default kalender otomatis mundur 2 hari biar gambar EPIC selalu ada
+        $date = $request->input('date', date('Y-m-d', strtotime('-2 days')));
 
         // 1. Tembak API APOD (Astronomy Picture of the Day)
         $apodResponse = Http::get("https://api.nasa.gov/planetary/apod", [
