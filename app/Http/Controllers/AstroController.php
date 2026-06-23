@@ -49,7 +49,7 @@ class AstroController extends Controller
             'date' => $date,
             'apod' => $apod,
             'asteroids' => $asteroids,
-            'marsPhotos' => $marsPhotos
+            'earthPhotos' => $earthPhotos
         ]);
     }
 }
