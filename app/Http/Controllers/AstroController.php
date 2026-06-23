@@ -17,7 +17,8 @@ class AstroController extends Controller
 
         // 1. Tembak API APOD (Astronomy Picture of the Day)
         $apodResponse = Http::get("https://api.nasa.gov/planetary/apod", [
-            'api_key' => $apiKey
+            'api_key' => $apiKey,
+            'date' => $date
         ]);
         $apod = $apodResponse->successful() ? $apodResponse->json() : null;
 
