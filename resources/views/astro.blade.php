@@ -154,6 +154,6 @@
             });
             countSpan.innerText = visibleCount;
         }
-
+    </script>
 </body>
 </html>
