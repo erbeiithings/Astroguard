@@ -122,6 +122,13 @@
             @endif
         </div>
 
+    <footer class="mt-16 pt-8 pb-4 border-t border-gray-800 text-center">
+            <p class="text-gray-500 text-sm md:text-base">
+                🚀 <strong>AstroGuard Tracker</strong> adalah aplikasi <i>prototype</i>.<br>
+                Dibangun secara khusus untuk memenuhi tugas dan evaluasi nilai mata kuliah Teknologi Web Service. -Rabbani
+            </p>
+        </footer>
+            
     </div>
 
     <script>
@@ -147,15 +154,6 @@
             });
             countSpan.innerText = visibleCount;
         }
-    <footer class="mt-16 pt-8 pb-4 border-t border-gray-800 text-center">
-            <p class="text-gray-500 text-sm md:text-base">
-                🚀 <strong>AstroGuard Tracker</strong> adalah aplikasi <i>prototype</i>.<br>
-                Dibangun secara khusus untuk memenuhi tugas dan evaluasi nilai mata kuliah Teknologi Web Service. -Rabbani
-            </p>
-        </footer>
 
-    </div> <script>
-
-    </script>
 </body>
 </html>
