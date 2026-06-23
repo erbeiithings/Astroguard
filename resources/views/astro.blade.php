@@ -3,114 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AstroGuard - NASA Asteroid Tracker</title>
-    <!-- Tailwind CSS untuk styling -->
+    <title>AstroGuard - NASA Web Service</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Styling buat tombol toggle/switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #ef4444;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ef4444;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 p-8 min-h-screen font-sans">
+<body class="bg-gray-900 text-gray-200 min-h-screen">
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="mb-10 text-center">
-            <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-3">
-                🚀 AstroGuard Radar
-            </h1>
-            <p class="text-gray-400 text-lg">Sistem Pemantauan Asteroid Dekat Bumi (Data Real-time dari NASA API)</p>
+    @if(isset($apod['url']))
+    <div class="relative w-full h-80 bg-cover bg-center" style="background-image: url('{{ $apod['url'] }}');">
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-center p-6">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-2 tracking-wider">🚀 AstroGuard Tracker</h1>
+            <p class="text-lg text-gray-300 max-w-2xl italic">"{{ $apod['title'] ?? 'Exploring the Cosmos' }}"</p>
         </div>
+    </div>
+    @else
+    <div class="w-full bg-gray-800 p-10 text-center">
+        <h1 class="text-4xl font-extrabold text-white mb-2 tracking-wider">🚀 AstroGuard Tracker</h1>
+    </div>
+    @endif
 
-        <!-- Form Pencarian Berdasarkan Tanggal -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-10 max-w-2xl mx-auto border border-gray-700">
-            <form method="GET" action="/" class="flex flex-col md:flex-row gap-4 items-center">
-                <div class="w-full">
-                    <label class="block text-sm text-gray-400 mb-2">Pilih Tanggal Pantauan:</label>
-                    <input type="date" name="date" value="{{ $searchDate }}" required
-                           class="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                </div>
-                <div class="w-full md:w-auto mt-auto">
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg shadow-blue-600/30">
-                        Scan Ruang Angkasa
-                    </button>
-                </div>
+    <div class="max-w-7xl mx-auto p-6 md:p-10">
+        
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 mb-10 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-blue-400">Pilih Tanggal Observasi</h2>
+                <p class="text-sm text-gray-400">Sinkronisasi data langsung dari server NASA</p>
+            </div>
+            <form method="GET" action="/" class="flex gap-3 w-full md:w-auto">
+                <input type="date" name="date" value="{{ $date }}" class="bg-gray-700 text-white border border-gray-600 rounded-lg p-3 w-full focus:outline-none focus:border-blue-500">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                    Scan API
+                </button>
             </form>
         </div>
 
-        <!-- Indikator Total -->
-        <div class="mb-6 flex justify-between items-end border-b border-gray-700 pb-2">
-            <h2 class="text-2xl font-bold text-gray-200">Hasil Pemindaian: {{ date('d F Y', strtotime($searchDate)) }}</h2>
-            <span class="bg-blue-900 text-blue-200 py-1 px-3 rounded-full text-sm font-semibold">
-                Ditemukan {{ $totalCount }} Asteroid
-            </span>
-        </div>
-
-        <!-- Error Handling -->
-        @if($isError)
-            <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6">
-                ⚠️ Gagal terhubung ke server NASA. Silakan coba lagi nanti atau periksa koneksi internet Anda.
-            </div>
-        @endif
-
-        <!-- Menampilkan Hasil API -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            @forelse ($asteroids as $ast)
-                <!-- Kartu Asteroid -->
-                <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-blue-500 transition duration-300 shadow-lg group">
-                    
-                    <!-- Header Kartu -->
-                    <div class="p-5 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
-                        <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition">{{ $ast['name'] }}</h3>
-                        
-                        <!-- Indikator Bahaya (Hazardous) -->
-                        @if($ast['is_potentially_hazardous_asteroid'])
-                            <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded animate-pulse">BERBAHAYA</span>
-                        @else
-                            <span class="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">AMAN</span>
-                        @endif
-                    </div>
-
-                    <!-- Body Kartu: Data Teknis dari NASA -->
-                    <div class="p-5 space-y-4">
-                        <!-- Diameter -->
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Estimasi Ukuran (Diameter)</p>
-                            <p class="text-lg text-gray-200 font-mono">
-                                {{ number_format($ast['estimated_diameter']['meters']['estimated_diameter_min'], 2) }}m - 
-                                {{ number_format($ast['estimated_diameter']['meters']['estimated_diameter_max'], 2) }}m
-                            </p>
-                        </div>
-
-                        <!-- Kecepatan Relatif -->
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Kecepatan Melintas</p>
-                            <p class="text-lg text-gray-200 font-mono">
-                                {{ number_format($ast['close_approach_data'][0]['relative_velocity']['kilometers_per_hour'], 2) }} km/jam
-                            </p>
-                        </div>
-
-                        <!-- Jarak Meleset (Miss Distance) -->
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Jarak dari Bumi</p>
-                            <p class="text-lg text-blue-300 font-mono font-bold">
-                                {{ number_format($ast['close_approach_data'][0]['miss_distance']['kilometers'], 2) }} km
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer Kartu -->
-                    <div class="bg-gray-900 p-3 text-center text-xs text-gray-500">
-                        NASA JPL ID: {{ $ast['id'] }}
+        <div class="mb-12">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    ☄️ Radar Asteroid (<span id="asteroid-count">{{ count($asteroids) }}</span> Objek)
+                </h2>
+                
+                <div class="flex items-center mt-4 md:mt-0 gap-3">
+                    <span class="text-sm text-gray-400">Hanya tampilkan yang berbahaya</span>
+                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" id="hazardToggle" onchange="filterHazards()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out z-10"/>
+                        <label for="hazardToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-200 ease-in-out"></label>
                     </div>
                 </div>
-            @empty
-                @if(!$isError)
-                    <div class="col-span-full p-8 text-center bg-gray-800 border border-gray-700 text-gray-400 rounded-xl">
-                        Tidak ada asteroid yang terdeteksi melintas dekat bumi pada tanggal ini.
-                    </div>
-                @endif
-            @endforelse
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="asteroid-container">
+                @forelse ($asteroids as $asteroid)
+                    @php 
+                        $isHazard = $asteroid['is_potentially_hazardous_asteroid'];
+                        $speed = number_format($asteroid['close_approach_data'][0]['relative_velocity']['kilometers_per_hour'] ?? 0, 0, ',', '.');
+                        $distance = number_format($asteroid['close_approach_data'][0]['miss_distance']['kilometers'] ?? 0, 0, ',', '.');
+                    @endphp
+                    
+                    <div class="asteroid-card bg-gray-800 rounded-xl p-5 border {{ $isHazard ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-gray-700' }}" data-hazard="{{ $isHazard ? 'true' : 'false' }}">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-bold text-lg text-white truncate w-3/4">{{ $asteroid['name'] }}</h3>
+                            @if($isHazard)
+                                <span class="bg-red-900 text-red-300 text-xs font-bold px-2 py-1 rounded animate-pulse">BAHAYA</span>
+                            @else
+                                <span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">Aman</span>
+                            @endif
+                        </div>
+                        
+                        <div class="space-y-2 text-sm text-gray-400">
+                            <p class="flex justify-between"><span>📏 Diameter:</span> <span class="text-gray-200">{{ number_format($asteroid['estimated_diameter']['meters']['estimated_diameter_max'], 2) }} m</span></p>
+                            <p class="flex justify-between"><span>🚀 Kecepatan:</span> <span class="text-gray-200">{{ $speed }} km/j</span></p>
+                            <p class="flex justify-between"><span>🎯 Jarak Melintas:</span> <span class="text-gray-200">{{ $distance }} km</span></p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full bg-gray-800 text-center p-8 rounded-xl border border-gray-700">
+                        <p class="text-gray-400">Tidak ada data asteroid pada tanggal ini.</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
+
+        <div>
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">🛸 Galeri Mars Rover Curiosity</h2>
+            @if(count($marsPhotos) > 0)
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    @foreach($marsPhotos as $photo)
+                        <div class="relative group overflow-hidden rounded-lg">
+                            <img src="{{ $photo['img_src'] }}" alt="Mars Photo" class="w-full h-48 object-cover transform transition duration-500 group-hover:scale-110">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 p-2 translate-y-full group-hover:translate-y-0 transition duration-300">
+                                <p class="text-xs text-white">Kamera: {{ $photo['camera']['full_name'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="bg-gray-800 text-center p-8 rounded-xl border border-gray-700">
+                    <p class="text-gray-400">Robot Curiosity tidak mengambil foto pada tanggal ini. Coba tanggal lain.</p>
+                </div>
+            @endif
+        </div>
+
     </div>
 
+    <script>
+        function filterHazards() {
+            let isChecked = document.getElementById('hazardToggle').checked;
+            let cards = document.querySelectorAll('.asteroid-card');
+            let countSpan = document.getElementById('asteroid-count');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                let isHazard = card.getAttribute('data-hazard') === 'true';
+                if (isChecked) {
+                    if (isHazard) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                } else {
+                    card.style.display = 'block';
+                    visibleCount++;
+                }
+            });
+            countSpan.innerText = visibleCount;
+        }
+    </script>
 </body>
 </html>
