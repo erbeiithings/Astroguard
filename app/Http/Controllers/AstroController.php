@@ -41,8 +41,8 @@ class AstroController extends Controller
         ]);
         $earthPhotos = [];
         if ($epicResponse->successful()) {
-            // Ambil maksimal 4 frame rotasi bumi biar tampilannya pas sebaris
-            $earthPhotos = array_slice($epicResponse->json() ?? [], 0, 4);
+            // Ambil maksimal 8 frame rotasi bumi biar tampilannya terlihat banyak
+            $earthPhotos = array_slice($epicResponse->json() ?? [], 0, 8);
         }
 
         // Lempar ke tampilan web
